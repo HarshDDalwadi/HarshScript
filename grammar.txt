@@ -1,0 +1,11 @@
+expression : term ((PLUS | MINUS) term)*
+
+term : factor ((MUL |DIV) factor)*
+
+factor	: (PLUS | MINUS) factor
+		: power
+
+power	: atom (POW factor)*
+
+atom	: (PLUS | MINUS) factor
+		: LPAREN expression RPAREN
