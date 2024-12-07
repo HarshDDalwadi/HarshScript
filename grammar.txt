@@ -1,4 +1,5 @@
-expression : term ((PLUS | MINUS) term)*
+expression	: KEYWORD: VAR IDENTIFIER EQ expression
+			: term ((PLUS | MINUS) term)*
 
 term : factor ((MUL |DIV) factor)*
 
@@ -7,5 +8,5 @@ factor	: (PLUS | MINUS) factor
 
 power	: atom (POW factor)*
 
-atom	: (PLUS | MINUS) factor
+atom	: INT |FLOAT | IDENTIFIER
 		: LPAREN expression RPAREN

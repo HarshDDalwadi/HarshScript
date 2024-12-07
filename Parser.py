@@ -6,7 +6,11 @@ class ParseResult:
 	def __init__(self):
 		self.error = None
 		self.node = None
-	
+		self.advance_count = 0
+
+	def register_advancement(self):
+		self.advance_count += 1
+
 	def register(self, res):
 		if (isinstance(res, ParseResult)):
 			if (res.error):
@@ -46,8 +50,13 @@ class Parser:
 		res = ParseResult()
 		token = self.current_token
 		if token.type in (TT_INT, TT_FLOAT):
-			res.register(self.advance())
+			res.register_advancement()
+			self.advance()
 			return res.success(NumberNode(token))
+		elif token.type == TT_IDENTIFIER:
+			res.register_advancement()
+			self.advance()
+			return res.success(VarAccessNode(token))
 		elif token.type == TT_LPAREN:
 			res.register(self.advance())
 			expr = res.register(self.expression())
@@ -80,7 +89,34 @@ class Parser:
 		return self.bin_op(self.factor, (TT_MUL, TT_DIV))
 
 	def expression(self):
-		return self.bin_op(self.term, (TT_PLUS, TT_MINUS))
+		res = ParseResult()
+		if(self.current_token.matches(TT_KEYWORD, 'VAR')):
+			res.register_advancement()
+			self.advance()
+
+			if(self.current_token.type != TT_IDENTIFIER):
+				return res.failure(InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end, "Expected Identifier"))
+			var_name = self.current_token
+			res.register_advancement()
+			self.advance()
+
+			if(self.current_token.type != TT_EQ):
+				return res.failure(InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end, "Expected '='"))
+		
+			res.register_advancement()
+			self.advance()
+			expr = res.register(self.expression())
+			if(res.error): return res
+			return res.success(VarAssignNode(var_name, expr))
+		
+		node = res.register(self.bin_op(self.term, (TT_PLUS, TT_MINUS)))
+		if res.error:
+			return res.failure(InvalidSyntaxError(
+				self.current_token.pos_start, self.current_token.pos_end,
+				"Expected 'VAR', int, float, identifier, '+', '-' or '('"
+			))
+
+		return res.success(node)
 
 	def bin_op(self, func_a, ops, func_b = None):
 		if(func_b == None): func_b = func_a

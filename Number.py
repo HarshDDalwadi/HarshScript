@@ -36,6 +36,12 @@ class Number:
 			if(other.value == 0):
 				return None, RTError(other.pos_start, other.pos_end, self.context, 'Division by Zero')
 			return Number(self.value / other.value).set_context(self.context), None
+
+	def copy(self):
+		copy = Number(self.value)
+		copy.set_pos(self.pos_start, self.pos_end)
+		copy.set_context(self.context)
+		return copy
 	
 	def __repr__(self):
 		return str(self.value)
