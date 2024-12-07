@@ -4,6 +4,8 @@ class SymbolTable:
 		self.parent = None
 
 	def get(self, name):
+		print("THE SYMBOL TABLE IS : ")
+		print(self.symbols)
 		value = self.symbols.get(name, None)
 		if value == None and self.parent:
 			return self.parent.get(name)
