@@ -1,5 +1,7 @@
 expression	: KEYWORD: VAR IDENTIFIER EQ expression
-			: term ((PLUS | MINUS) term)*
+			: arith-expr ((EE | LT | GT | LTE | GTE) arith-expr) *
+
+arith-expr	: term ((PLUS | MINUS) term)*
 
 term : factor ((MUL |DIV) factor)*
 
