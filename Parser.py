@@ -69,8 +69,7 @@ class Parser:
 					self.current_tok.pos_start, self.current_tok.pos_end,
 					"Expected ')'"
 				))
-		return res.failure(InvalidSyntaxError(token.pos_start, token.pos_end, "Expected int, float, '+', '-' or '('"))
-	
+
 	def power(self):
 		return self.bin_op(self.atom, (TT_POW, ), self.factor)
 
@@ -153,4 +152,3 @@ class Parser:
 	
 	def arith_expr(self):
 		return self.bin_op(self.factor, (TT_PLUS, TT_MINUS))
-	
